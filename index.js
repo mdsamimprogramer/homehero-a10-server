@@ -57,10 +57,27 @@ async function run() {
     const bookingCollection = db.collection("bookings");
 
     // find
+    // filter
+    //aaaaaaaaaaaaaaaaaaaaaaaa
     app.get("/services", async (req, res) => {
-      const result = await serviceCollection.find().toArray();
+      const { minPrice, maxPrice } = req.query;
+      let filter = {};
+
+      if (minPrice && maxPrice) {
+        filter.price = {
+          $gte: parseFloat(minPrice),
+          $lte: parseFloat(maxPrice),
+        };
+      } else if (minPrice) {
+        filter.price = { $gte: parseFloat(minPrice) };
+      } else if (maxPrice) {
+        filter.price = { $lte: parseFloat(maxPrice) };
+      }
+
+      const result = await serviceCollection.find(filter).sort({ price: 1 }).toArray();
       res.send(result);
     });
+    //aaaaaaaaaaaaa
 
     app.get("/services/:id", async (req, res) => {
       const { id } = req.params;
@@ -68,6 +85,25 @@ async function run() {
       const objectId = new ObjectId(id);
       const result = await serviceCollection.findOne({ _id: objectId });
       res.send({ success: true, result });
+    });
+
+    app.get("/services", async (req, res) => {
+      const { minPrice, maxPrice } = req.query;
+      let filter = {};
+
+      if (minPrice && maxPrice) {
+        filter.price = {
+          $gte: parseFloat(minPrice),
+          $lte: parseFloat(maxPrice),
+        };
+      } else if (minPrice) {
+        filter.price = { $gte: parseFloat(minPrice) };
+      } else if (maxPrice) {
+        filter.price = { $lte: parseFloat(maxPrice) };
+      }
+
+      const result = await serviceCollection.find(filter).toArray();
+      res.send(result);
     });
 
     // post method
