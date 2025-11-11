@@ -58,7 +58,7 @@ async function run() {
 
     // find
     // filter
-    //aaaaaaaaaaaaaaaaaaaaaaaa
+    //aaaaaaaaaaaaaaaaa
     app.get("/services", async (req, res) => {
       const { minPrice, maxPrice } = req.query;
       let filter = {};
@@ -74,7 +74,10 @@ async function run() {
         filter.price = { $lte: parseFloat(maxPrice) };
       }
 
-      const result = await serviceCollection.find(filter).sort({ price: 1 }).toArray();
+      const result = await serviceCollection
+        .find(filter)
+        .sort({ price: 1 })
+        .toArray();
       res.send(result);
     });
     //aaaaaaaaaaaaa
@@ -115,6 +118,41 @@ async function run() {
         success: true,
         result,
       });
+    });
+
+    // POST /services/:id/review
+    app.post("/services/:id/reviews", async (req, res) => {
+      const id = req.params.id;
+      const review = req.body;
+
+      const result = await servicesCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $push: { reviews: review } }
+      );
+
+      res.send(result);
+    });
+
+    // GET /services/top-rated
+    app.get("/services/top-rated", async (req, res) => {
+      try {
+        const topServices = await serviceCollection
+          .aggregate([
+            {
+              $addFields: {
+                avgRating: { $avg: "$reviews.rating" },
+              },
+            },
+            { $sort: { avgRating: -1 } },
+            { $limit: 6 },
+          ])
+          .toArray();
+
+        res.send(topServices);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Failed to fetch top rated services" });
+      }
     });
 
     // PUT
