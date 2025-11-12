@@ -121,16 +121,22 @@ async function run() {
     });
 
     // POST /services/:id/review
+    // ⭐ Add review to a service
     app.post("/services/:id/reviews", async (req, res) => {
-      const id = req.params.id;
-      const review = req.body;
+      try {
+        const id = req.params.id;
+        const review = req.body; // { userEmail, userName, rating, comment, date }
 
-      const result = await servicesCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $push: { reviews: review } }
-      );
+        const result = await serviceCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $push: { reviews: review } }
+        );
 
-      res.send(result);
+        res.send({ success: true, result });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Failed to add review" });
+      }
     });
 
     // GET /services/top-rated
