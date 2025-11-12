@@ -90,25 +90,6 @@ async function run() {
       res.send({ success: true, result });
     });
 
-    app.get("/services", async (req, res) => {
-      const { minPrice, maxPrice } = req.query;
-      let filter = {};
-
-      if (minPrice && maxPrice) {
-        filter.price = {
-          $gte: parseFloat(minPrice),
-          $lte: parseFloat(maxPrice),
-        };
-      } else if (minPrice) {
-        filter.price = { $gte: parseFloat(minPrice) };
-      } else if (maxPrice) {
-        filter.price = { $lte: parseFloat(maxPrice) };
-      }
-
-      const result = await serviceCollection.find(filter).toArray();
-      res.send(result);
-    });
-
     // post method
     // insertOne
     app.post("/services", async (req, res) => {
@@ -121,7 +102,7 @@ async function run() {
     });
 
     // POST /services/:id/review
-    // ⭐ Add review to a service
+    // Add review to a service
     app.post("/services/:id/reviews", async (req, res) => {
       try {
         const id = req.params.id;
@@ -139,25 +120,25 @@ async function run() {
       }
     });
 
-    // GET /services/top-rated
+    // ✅ Top 6 Rated Services API
     app.get("/services/top-rated", async (req, res) => {
       try {
-        const topServices = await serviceCollection
+        const services = await serviceCollection
           .aggregate([
             {
               $addFields: {
-                avgRating: { $avg: "$reviews.rating" },
+                avgRating: { $avg: "$reviews.rating" }, // reviews 
               },
             },
             { $sort: { avgRating: -1 } },
-            { $limit: 6 },
+            { $limit: 6 }, 
           ])
           .toArray();
 
-        res.send(topServices);
+        res.json(services);
       } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "Failed to fetch top rated services" });
+        console.error("Error fetching top-rated services:", error);
+        res.status(500).json({ message: "Internal Server Error" });
       }
     });
 
