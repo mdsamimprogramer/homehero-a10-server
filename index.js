@@ -120,14 +120,14 @@ async function run() {
       }
     });
 
-    // ✅ Top 6 Rated Services API
+    // Top 6 Rated Services API
     app.get("/services/top-rated", async (req, res) => {
       try {
         const services = await serviceCollection
           .aggregate([
             {
               $addFields: {
-                avgRating: { $avg: "$reviews.rating" }, // reviews 
+                avgRating: { $avg: "$reviews.rating" },
               },
             },
             { $sort: { avgRating: -1 } },
@@ -163,16 +163,6 @@ async function run() {
       const filter = { _id: objectId };
       const result = await serviceCollection.deleteOne(filter);
       res.send({ success: true, result });
-    });
-
-    // latest 6 data /get/find
-    app.get("/latest-services", async (req, res) => {
-      const result = await serviceCollection
-        .find()
-        .sort({ created_at: "asc" })
-        .limit(6)
-        .toArray();
-      res.send(result);
     });
 
     app.get("/my-services", async (req, res) => {
