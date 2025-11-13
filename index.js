@@ -10,10 +10,6 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-// home
-// EGb5jyKkFCgwytUh
-// home_hero
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -32,7 +28,6 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // await client.connect();
-
     const db = client.db("home_hero");
     const serviceCollection = db.collection("services");
     console.log(serviceCollection);
@@ -41,7 +36,6 @@ async function run() {
 
     // find
     // filter
-    //aaaaaaaaaaaaaaaaa
     app.get("/services", async (req, res) => {
       const { minPrice, maxPrice } = req.query;
       let filter = {};
@@ -63,7 +57,6 @@ async function run() {
         .toArray();
       res.send(result);
     });
-    //aaaaaaaaaaaaa
 
     app.get("/services/:id", async (req, res) => {
       const { id } = req.params;
@@ -124,7 +117,6 @@ async function run() {
       }
     });
 
-    // PUT
     // updateOne
     app.put("/services/:id", async (req, res) => {
       const { id } = req.params;
@@ -221,7 +213,6 @@ async function run() {
           { _id: new ObjectId(booking.serviceId) },
           { $inc: { bookings: -1 } }
         );
-
         res.send({ message: "Booking canceled" });
       } catch (error) {
         console.error(error);
@@ -243,7 +234,7 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
-    // Ensures that the client will close
+    // client will close
   }
 }
 run().catch(console.dir);
