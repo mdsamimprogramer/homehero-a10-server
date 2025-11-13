@@ -29,23 +29,6 @@ const client = new MongoClient(uri, {
   },
 });
 
-// const verifyToken = async (req, res, next) => {
-//   const authorization = req.headers.authorization;
-
-//   if (!authorization) {
-//     return res.status(401).send({ message: "Unauthorized: Token missing" });
-//   }
-//   const token = authorization.split(" ")[1];
-
-//   try {
-//     const decoded = await admin.auth().verifyIdToken(token);
-//     req.user = decoded;
-//     next();
-//   } catch (error) {
-//     res.status(401).send({ message: "Forbidden: Invalid token" });
-//   }
-// };
-
 async function run() {
   try {
     await client.connect();
@@ -101,12 +84,11 @@ async function run() {
       });
     });
 
-    // POST /services/:id/review
     // Add review to a service
     app.post("/services/:id/reviews", async (req, res) => {
       try {
         const id = req.params.id;
-        const review = req.body; // { userEmail, userName, rating, comment, date }
+        const review = req.body;
 
         const result = await serviceCollection.updateOne(
           { _id: new ObjectId(id) },
@@ -131,7 +113,7 @@ async function run() {
               },
             },
             { $sort: { avgRating: -1 } },
-            { $limit: 6 }, 
+            { $limit: 6 },
           ])
           .toArray();
 
@@ -261,7 +243,7 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
-    // Ensures that the client will close when you stop the server
+    // Ensures that the client will close
   }
 }
 run().catch(console.dir);
