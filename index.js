@@ -18,7 +18,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const uri = `mongodb+srv://home_hero:EGb5jyKkFCgwytUh@cluster0.qzimykk.mongodb.net/?appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.qzimykk.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -31,7 +31,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const db = client.db("home_hero");
     const serviceCollection = db.collection("services");
@@ -238,7 +238,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
